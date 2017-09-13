@@ -1,7 +1,12 @@
 <h3>TinyApp</h3>
+
+<% if (username === undefined) { %>
 <form method="POST" action="/login">
   <label>Username: </label>
   <input id="username" type="text" name="username">
   <input type="submit" value="Submit">
 </form>
-<label>Current User: <%= username %></label>
+<% } else { %>
+  <label>Current User: <%= username %></label>
+  <!-- Add and handle POST from logout button -->
+<% } %>
