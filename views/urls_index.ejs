@@ -4,7 +4,9 @@
 <% include ./partials/_header.ejs %>
 <body>
     <% for (var key in urls) { %>
-    <li><%= key %>:<%= urls[key] %></li>
+    <form method="POST" action ="/urls/<%= key %>/delete">
+    <li><%= key %>:<%= urls[key] %><input type="submit" value="Delete"></li>
+    </form>
     <% }; %>
   <p><a href="deadlink">Shorten URL</a></p>
 </body>

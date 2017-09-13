@@ -45,7 +45,13 @@ app.get("/urls/:id", (request, response) => {
 app.get("/u/:shortURL", (request, response) => {
   // console.log(request.params.shortURL);
   response.redirect(urlDatabase[request.params.shortURL]);
-})
+});
+
+app.post("/urls/:id/delete", (request, response) => {
+  // console.log(request.params.id);
+  delete urlDatabase[request.params.id];
+  response.redirect("/urls");
+});
 
 app.post("/urls", (request, response) => {
   //console.log(request.body);
@@ -53,7 +59,7 @@ app.post("/urls", (request, response) => {
   urlDatabase[randomString] = request.body.longURL;
   console.log(urlDatabase);
   response.redirect("http://localhost:8080/urls/" + randomString);
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
