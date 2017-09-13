@@ -50,3 +50,15 @@ app.post("/urls", (request, response) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
+
+console.log(generateRandomString());
+
+function generateRandomString() {
+  let result = '';
+  const characterSet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const length = 6;
+    for (var i = 0 ; i < length ; i++) {
+      result += characterSet[Math.floor(Math.random() * characterSet.length)];
+    }
+  return result;
+}
