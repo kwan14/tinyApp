@@ -42,16 +42,20 @@ app.get("/urls/:id", (request, response) => {
   response.render("urls_show", templateVars);
 });
 
+
+
 app.post("/urls", (request, response) => {
-  console.log(request.body);
-  response.send("Ok");
+  //console.log(request.body);
+  let randomString = generateRandomString();
+  urlDatabase[randomString] = request.body.longURL;
+  console.log(urlDatabase);
+  response.redirect("http://localhost:8080/urls/" + randomString);
 })
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
 
-console.log(generateRandomString());
 
 function generateRandomString() {
   let result = '';
