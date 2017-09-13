@@ -33,13 +33,13 @@ app.get("/urls", (request, response) => {
   response.render("urls_index", templateVars);
 });
 
+app.get("/urls/new", (request, response) => {
+  response.render("urls_new");
+});
+
 app.get("/urls/:id", (request, response) => {
   let templateVars = { shortURL : request.params.id, urls : urlDatabase };
   response.render("urls_show", templateVars);
-});
-
-app.get("/urls/new", (request, response) => {
-  response.send("TEST");
 });
 
 app.post("/urls", (request, response) => {
