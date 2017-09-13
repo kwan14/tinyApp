@@ -42,7 +42,10 @@ app.get("/urls/:id", (request, response) => {
   response.render("urls_show", templateVars);
 });
 
-
+app.get("/u/:shortURL", (request, response) => {
+  // console.log(request.params.shortURL);
+  response.redirect(urlDatabase[request.params.shortURL]);
+})
 
 app.post("/urls", (request, response) => {
   //console.log(request.body);
