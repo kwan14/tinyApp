@@ -53,6 +53,14 @@ app.post("/urls/:id/delete", (request, response) => {
   response.redirect("/urls");
 });
 
+app.post("/urls/:id", (request, response) => {
+  //console.log("Recieved update request");
+  //console.log(request.params.id);
+  //console.log(request.body);
+  urlDatabase[request.params.id] = request.body.longURL;
+  response.redirect(`/urls/${request.params.id}`);
+})
+
 app.post("/urls", (request, response) => {
   //console.log(request.body);
   let randomString = generateRandomString();

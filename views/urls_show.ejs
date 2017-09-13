@@ -8,5 +8,9 @@
     <li><%= key %>:<%= urls[key] %></li>
     <%  } %>
     <% } %>
+    <form method = "POST" action = "/urls/<%= shortURL%>">
+      <input id="longURL" type="text" name="longURL" placeholder="<%= urls[shortURL] %>">
+      <input type="submit" value="Update">
+    </form>
 </body>
 </html>
