@@ -1,0 +1,11 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<% include ./partials/_header.ejs %>
+<body>
+    <% for (var key in urls) { %>
+    <li><%= key %>:<%= urls[key] %></li>
+    <% }; %>
+  <p><a href="deadlink">Shorten URL</a></p>
+</body>
+</html>
