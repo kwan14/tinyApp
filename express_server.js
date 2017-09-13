@@ -32,16 +32,16 @@ app.get("/hello", (request, response) => {
 */
 
 app.get("/urls", (request, response) => {
-  let templateVars = { urls : urlDatabase };
+  let templateVars = { username : request.cookies["username"], urls : urlDatabase };
   response.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (request, response) => {
-  response.render("urls_new");
+  response.render("urls_new", { username : request.cookies["username"] });
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { shortURL : request.params.id, urls : urlDatabase };
+  let templateVars = { username : request.cookies["username"], shortURL : request.params.id, urls : urlDatabase };
   response.render("urls_show", templateVars);
 });
 
@@ -68,9 +68,15 @@ app.post("/urls", (request, response) => {
   //console.log(request.body);
   let randomString = generateRandomString();
   urlDatabase[randomString] = request.body.longURL;
-  console.log(urlDatabase);
-  response.redirect("http://localhost:8080/urls/" + randomString);
+  //console.log(urlDatabase);
+  response.redirect("/urls/" + randomString);
 });
+
+app.post("/login", (request, response) => {
+  //console.log(request.body);
+  response.cookie("username", request.body.username);
+  response.redirect("/urls");
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
