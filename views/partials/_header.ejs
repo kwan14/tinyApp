@@ -9,4 +9,7 @@
 <% } else { %>
   <label>Current User: <%= username %></label>
   <!-- Add and handle POST from logout button -->
+<form method="POST" action="/logout">
+  <input type="submit" value="Logout">
+</form>
 <% } %>

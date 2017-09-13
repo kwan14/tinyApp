@@ -76,6 +76,11 @@ app.post("/login", (request, response) => {
   //console.log(request.body);
   response.cookie("username", request.body.username);
   response.redirect("/urls");
+});
+
+app.post("/logout", (request, response) => {
+  response.clearCookie("username");
+  response.redirect("/urls");
 })
 
 app.listen(PORT, () => {
