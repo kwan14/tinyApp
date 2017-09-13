@@ -1,35 +1,29 @@
 
-var express = require("express");
-var app = express();
-var cookieParser = require("cookie-parser");
-var PORT = process.env.PORT || 8080;
+// Import required modules
 
+const express = require("express");
+const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
+// Initialize and Configure Express
 
+const app = express();
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended : true }));
 app.use(cookieParser());
 
-var urlDatabase = {
+// Initialize variables for testing
+
+const PORT = process.env.PORT || 8080;
+
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-app.set("view engine", "ejs");
 
-/*
-app.get("/", (request, response) => {
-  response.end("Hello!");
-});
+// Handle HTTP GET requests
 
-app.get("/urls.json", (request, response) => {
-  response.json(urlDatabase);
-});
-
-app.get("/hello", (request, response) => {
-  response.end("<html><body>Hello <b>World</b></body></html>\n");
-});
-*/
 
 app.get("/urls", (request, response) => {
   let templateVars = { username : request.cookies["username"], urls : urlDatabase };
@@ -37,7 +31,8 @@ app.get("/urls", (request, response) => {
 });
 
 app.get("/urls/new", (request, response) => {
-  response.render("urls_new", { username : request.cookies["username"] });
+  let templateVars = { username : request.cookies["username"] };
+  response.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (request, response) => {
@@ -46,34 +41,30 @@ app.get("/urls/:id", (request, response) => {
 });
 
 app.get("/u/:shortURL", (request, response) => {
-  // console.log(request.params.shortURL);
   response.redirect(urlDatabase[request.params.shortURL]);
 });
 
+
+// Handle HTTP POST requests
+
+
 app.post("/urls/:id/delete", (request, response) => {
-  // console.log(request.params.id);
   delete urlDatabase[request.params.id];
   response.redirect("/urls");
 });
 
 app.post("/urls/:id", (request, response) => {
-  //console.log("Recieved update request");
-  //console.log(request.params.id);
-  //console.log(request.body);
   urlDatabase[request.params.id] = request.body.longURL;
   response.redirect(`/urls/${request.params.id}`);
 })
 
 app.post("/urls", (request, response) => {
-  //console.log(request.body);
   let randomString = generateRandomString();
   urlDatabase[randomString] = request.body.longURL;
-  //console.log(urlDatabase);
   response.redirect("/urls/" + randomString);
 });
 
 app.post("/login", (request, response) => {
-  //console.log(request.body);
   response.cookie("username", request.body.username);
   response.redirect("/urls");
 });
@@ -84,15 +75,19 @@ app.post("/logout", (request, response) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`TinyApp listening on port ${PORT}`);
 });
+
+
+
+// A random six character alphanumeric string is being used as simulate the shortened URL
 
 
 function generateRandomString() {
   let result = '';
   const characterSet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const length = 6;
-    for (var i = 0 ; i < length ; i++) {
+    for (let i = 0 ; i < length ; i++) {
       result += characterSet[Math.floor(Math.random() * characterSet.length)];
     }
   return result;
