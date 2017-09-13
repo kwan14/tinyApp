@@ -1,8 +1,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<% include ./partials/_header.ejs %>
+<head></head>
 <body>
+  <% include ./partials/_header.ejs %>
     <% for (var key in urls) { %>
     <%  if (key === shortURL) { %>
     <li><%= key %>:<%= urls[key] %></li>
