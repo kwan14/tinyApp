@@ -21,6 +21,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "AAAAAA" : {
+    id : "AAAAAA",
+    email : "john.doe@domain.com",
+    password : "john" }
+};
 
 // Handle HTTP GET requests
 
@@ -43,6 +49,10 @@ app.get("/urls/:id", (request, response) => {
 app.get("/u/:shortURL", (request, response) => {
   response.redirect(urlDatabase[request.params.shortURL]);
 });
+
+app.get("/register", (request, response) => {
+  response.render("urls_register");
+})
 
 
 // Handle HTTP POST requests
@@ -72,6 +82,18 @@ app.post("/login", (request, response) => {
 app.post("/logout", (request, response) => {
   response.clearCookie("username");
   response.redirect("/urls");
+});
+
+app.post("/register", (request, response) => {
+  let newUserID = generateRandomString();
+  if (request.body.email === "" || request.body.email === "" || locateUser(request.body.email)) {
+    response.status(400).send("Error");
+  } else {
+    users[newUserID] = { id : newUserID , email : request.body.email, password : request.body.password };
+    response.cookie("user_id", newUserID);
+    response.redirect("/urls")
+    console.log(users);
+  }
 })
 
 app.listen(PORT, () => {
@@ -91,4 +113,14 @@ function generateRandomString() {
       result += characterSet[Math.floor(Math.random() * characterSet.length)];
     }
   return result;
+}
+
+function locateUser(emailAddress) {
+  for (let userID in users) {
+    if (users[userID].email === emailAddress) {
+      console.log("EMAIL FOUND");
+      return true;
+    }
+    return false;
+  }
 }
