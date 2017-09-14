@@ -25,7 +25,13 @@ const users = {
   "AAAAAA" : {
     id : "AAAAAA",
     email : "john.doe@domain.com",
-    password : "john" }
+    password : "john"
+  },
+  "BBBBBB" : {
+    id : "BBBBBB",
+    email : "jane.doe@domain.com",
+    password : "jane"
+  }
 };
 
 // Handle HTTP GET requests
