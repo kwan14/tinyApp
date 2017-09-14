@@ -17,8 +17,8 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 8080;
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL : "http://www.lighthouselabs.ca", owner : "AAAAAA" },
+  "9sm5xK": { longURL : "http://www.google.com", owner : "BBBBBB" }
 };
 
 const users = {
@@ -46,8 +46,12 @@ app.get("/urls", (request, response) => {
 
 app.get("/urls/new", (request, response) => {
   let user = users[request.cookies["user_id"]];
-  let templateVars = { user : user };
-  response.render("urls_new", templateVars);
+  if (user === undefined) {
+    response.redirect("/login");
+  } else {
+    let templateVars = { user : user };
+    response.render("urls_new", templateVars);
+  };
 });
 
 app.get("/urls/:id", (request, response) => {
