@@ -4,6 +4,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
 
 // Initialize and Configure Express
 
@@ -111,21 +112,22 @@ app.post("/urls/:id", (request, response) => {
 app.post("/urls", (request, response) => {
   let randomString = generateRandomString();
   urlDatabase[randomString] = { longURL : request.body.longURL, owner : request.cookies.user_id };
-  console.log(urlDatabase);
   response.redirect("/urls/" + randomString);
 });
 
 app.post("/login", (request, response) => {
   let user;
   for (let id in users) {
-    if (users[id].email === request.body.email && users[id].password === request.body.password) {
+    if (users[id].email === request.body.email) {
       user = users[id];
-      response.cookie("user_id", user.id);
-      response.redirect("/urls");
-    } else {
-      response.status(403);
-      response.end("Error");
-    }
+    };
+  };
+  if (user && bcrypt.compareSync(request.body.password, user.password)) {
+    response.cookie("user_id", user.id);
+    response.redirect("/urls");
+  } else {
+    response.status(403);
+    response.end("Error");
   };
 });
 
@@ -140,7 +142,9 @@ app.post("/register", (request, response) => {
     response.status(400);
     response.end("Error");
   } else {
-    users[newUserID] = { id : newUserID , email : request.body.email, password : request.body.password };
+    let passwordHash = bcrypt.hashSync(request.body.password, 10);
+    users[newUserID] = { id : newUserID , email : request.body.email, password : passwordHash };
+    //console.log(users);
     response.cookie("user_id", newUserID);
     response.redirect("/urls")
   }
@@ -185,7 +189,6 @@ function urlsForUser(id) {
     if (urlDatabase[key].owner === id) {
       filteredDatabase[key] = { longURL : urlDatabase[key].longURL, owner : urlDatabase[key].owner };
     };
-    console.log(filteredDatabase);
     return filteredDatabase;
   }
 }
