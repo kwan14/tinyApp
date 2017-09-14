@@ -26,12 +26,12 @@ const users = {
   "AAAAAA" : {
     id : "AAAAAA",
     email : "john.doe@domain.com",
-    password : "john"
+    password : "$2a$10$/ojmxA1cM3ObNFQJ8cKzQ.4qpd.jYyKvYvQ8P.1ogycsiKiBECxma"
   },
   "BBBBBB" : {
     id : "BBBBBB",
     email : "jane.doe@domain.com",
-    password : "jane"
+    password : "$2a$10$RdrZYEmR4J100opWX8mi3Ouskf5J.DzX0UhCuvVeDtdoq4RpWYEuG"
   }
 };
 
@@ -156,7 +156,8 @@ app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);
 });
 
-
+//console.log("john:" + bcrypt.hashSync("john", 10));
+//console.log("jane:" + bcrypt.hashSync("jane", 10));
 
 // A random six character alphanumeric string is being used as simulate the shortened URL
 
@@ -181,7 +182,6 @@ function locateUser(emailAddress) {
   }
 }
 
-//urlsForUser("AAAAAA");
 
 function urlsForUser(id) {
   let filteredDatabase = {};
