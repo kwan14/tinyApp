@@ -103,7 +103,7 @@ app.post("/login", (request, response) => {
 });
 
 app.post("/logout", (request, response) => {
-  response.clearCookie("username");
+  response.clearCookie("user_id");
   response.redirect("/urls");
 });
 
