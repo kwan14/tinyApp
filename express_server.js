@@ -82,13 +82,14 @@ app.post("/urls/:id/delete", (request, response) => {
 });
 
 app.post("/urls/:id", (request, response) => {
-  urlDatabase[request.params.id] = request.body.longURL;
+  urlDatabase[request.params.id].longURL = request.body.longURL;
   response.redirect(`/urls/${request.params.id}`);
 })
 
 app.post("/urls", (request, response) => {
   let randomString = generateRandomString();
-  urlDatabase[randomString] = request.body.longURL;
+  urlDatabase[randomString] = { longURL : request.body.longURL, owner : request.cookies.user_id };
+  console.log(urlDatabase);
   response.redirect("/urls/" + randomString);
 });
 
@@ -123,9 +124,7 @@ app.post("/register", (request, response) => {
   }
 });
 
-app.post("/login", (request, response) => {
-  //Process login request...
-});
+
 
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);

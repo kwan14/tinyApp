@@ -6,7 +6,7 @@
     <% include ./partials/_header.ejs %>
     <% for (var key in urls) { %>
     <form method="POST" action ="/urls/<%= key %>/delete">
-    <li><%= key %>:<%= urls[key] %><a href="/urls/<%= key %>">Edit</a><input type="submit" value="Delete"></li>
+    <li><%= key %>:<%= urls[key].longURL %><a href="/urls/<%= key %>">Edit</a><input type="submit" value="Delete"></li>
     </form>
     <% }; %>
   <p><a href="NOT IMPLEMENTED YET">Shorten URL</a></p>
