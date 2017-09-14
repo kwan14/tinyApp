@@ -38,17 +38,21 @@ const users = {
 
 
 app.get("/urls", (request, response) => {
-  let templateVars = { username : request.cookies["username"], urls : urlDatabase };
+  let user = users[request.cookies["user_id"]];
+  //console.log(user);
+  let templateVars = { user : user , urls : urlDatabase };
   response.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (request, response) => {
-  let templateVars = { username : request.cookies["username"] };
+  let user = users[request.cookies["user_id"]];
+  let templateVars = { user : user };
   response.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { username : request.cookies["username"], shortURL : request.params.id, urls : urlDatabase };
+  let user = users[request.cookies["user_id"]];
+  let templateVars = { user : user, shortURL : request.params.id, urls : urlDatabase };
   response.render("urls_show", templateVars);
 });
 
@@ -58,7 +62,11 @@ app.get("/u/:shortURL", (request, response) => {
 
 app.get("/register", (request, response) => {
   response.render("urls_register");
-})
+});
+
+app.get("/login", (request, response) => {
+  response.render("urls_login");
+});
 
 
 // Handle HTTP POST requests
@@ -81,8 +89,17 @@ app.post("/urls", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
-  response.cookie("username", request.body.username);
-  response.redirect("/urls");
+  let user;
+  for (let id in users) {
+    if (users[id].email === request.body.email && users[id].password === request.body.password) {
+      user = users[id];
+      response.cookie("user_id", user.id);
+      response.redirect("/urls");
+    } else {
+      response.status(403);
+      response.end("Error");
+    }
+  };
 });
 
 app.post("/logout", (request, response) => {
@@ -93,14 +110,18 @@ app.post("/logout", (request, response) => {
 app.post("/register", (request, response) => {
   let newUserID = generateRandomString();
   if (request.body.email === "" || request.body.email === "" || locateUser(request.body.email)) {
-    response.status(400).send("Error");
+    response.status(400);
+    response.end("Error");
   } else {
     users[newUserID] = { id : newUserID , email : request.body.email, password : request.body.password };
     response.cookie("user_id", newUserID);
     response.redirect("/urls")
-    console.log(users);
   }
-})
+});
+
+app.post("/login", (request, response) => {
+  //Process login request...
+});
 
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);

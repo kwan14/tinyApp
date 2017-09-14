@@ -1,15 +1,25 @@
 <h3>TinyApp</h3>
 
-<% if (username === undefined) { %>
-<form method="POST" action="/login">
-  <label>Username: </label>
-  <input id="username" type="text" name="username">
-  <input type="submit" value="Submit">
-</form>
+<p>
+  <a href="/register">Register</a>
+</p>
+
+<% if (user) { %>
+
+<p>
+  <label>Current User: <%= user.email %></label>
+</p>
+<p>
+  <form method="POST" action="">
+    <input id="logout" type="submit" value="Logout">
+  </form>
+</p>
+
+
 <% } else { %>
-  <label>Current User: <%= username %></label>
-  <!-- Add and handle POST from logout button -->
-<form method="POST" action="/logout">
-  <input type="submit" value="Logout">
-</form>
-<% } %>
+
+<p>
+  <a href="/login">Login</a>
+</p>
+
+<% }; %>
