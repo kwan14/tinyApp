@@ -39,9 +39,13 @@ const users = {
 
 app.get("/urls", (request, response) => {
   let user = users[request.cookies["user_id"]];
-  //console.log(user);
-  let templateVars = { user : user , urls : urlDatabase };
-  response.render("urls_index", templateVars);
+  if (user === undefined) {
+    response.redirect("/login");
+  } else {
+    let filteredDatabase = urlsForUser(user.id);
+    let templateVars = { user : user , urls : filteredDatabase };
+    response.render("urls_index", templateVars);
+  };
 });
 
 app.get("/urls/new", (request, response) => {
@@ -56,12 +60,20 @@ app.get("/urls/new", (request, response) => {
 
 app.get("/urls/:id", (request, response) => {
   let user = users[request.cookies["user_id"]];
-  let templateVars = { user : user, shortURL : request.params.id, urls : urlDatabase };
-  response.render("urls_show", templateVars);
+  if (user === undefined) {
+    response.redirect("/login");
+  } else {
+    if (user.id === urlDatabase[request.params.id].owner) {
+      let templateVars = { user : user, shortURL : request.params.id, urls : urlDatabase };
+      response.render("urls_show", templateVars);
+    } else {
+      response.end("Not Authorized");
+    };
+  };
 });
 
 app.get("/u/:shortURL", (request, response) => {
-  response.redirect(urlDatabase[request.params.shortURL]);
+  response.redirect(urlDatabase[request.params.shortURL].longURL);
 });
 
 app.get("/register", (request, response) => {
@@ -77,13 +89,23 @@ app.get("/login", (request, response) => {
 
 
 app.post("/urls/:id/delete", (request, response) => {
-  delete urlDatabase[request.params.id];
-  response.redirect("/urls");
+  let user = users[request.cookies["user_id"]];
+  if (user.id === urlDatabase[request.params.id].owner) {
+    delete urlDatabase[request.params.id];
+    response.redirect("/urls");
+  } else {
+    response.end("Not Authorized");
+  };
 });
 
 app.post("/urls/:id", (request, response) => {
-  urlDatabase[request.params.id].longURL = request.body.longURL;
-  response.redirect(`/urls/${request.params.id}`);
+  let user = users[request.cookies["user_id"]];
+  if (user.id === urlDatabase[request.params.id].owner) {
+    urlDatabase[request.params.id].longURL = request.body.longURL;
+    response.redirect(`/urls/${request.params.id}`);
+  } else {
+    response.end("Not Authorized");
+  };
 })
 
 app.post("/urls", (request, response) => {
@@ -152,5 +174,18 @@ function locateUser(emailAddress) {
       return true;
     }
     return false;
+  }
+}
+
+//urlsForUser("AAAAAA");
+
+function urlsForUser(id) {
+  let filteredDatabase = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].owner === id) {
+      filteredDatabase[key] = { longURL : urlDatabase[key].longURL, owner : urlDatabase[key].owner };
+    };
+    console.log(filteredDatabase);
+    return filteredDatabase;
   }
 }
