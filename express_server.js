@@ -22,7 +22,8 @@ const PORT = process.env.PORT || 8080;
 
 const urlDatabase = {
   "b2xVn2": { longURL : "http://www.lighthouselabs.ca", owner : "AAAAAA" },
-  "9sm5xK": { longURL : "http://www.google.com", owner : "BBBBBB" }
+  "9sm5xK": { longURL : "http://www.google.com", owner : "BBBBBB" },
+  "abcdef": { longURL : "http://www.tsn.ca", owner : "AAAAAA"}
 };
 
 const users = {
@@ -43,13 +44,17 @@ const users = {
 
 app.get("/urls", (request, response) => {
   let user = users[request.session["user_id"]];
+
+  let templateVars = { user : undefined , urls : undefined };
   if (user === undefined) {
-    response.redirect("/login");
+    response.render("urls_index", templateVars);
   } else {
     let filteredDatabase = urlsForUser(user.id);
-    let templateVars = { user : user , urls : filteredDatabase };
+    templateVars.user = user;
+    templateVars.urls = filteredDatabase;
     response.render("urls_index", templateVars);
-  };
+  }
+
 });
 
 app.get("/urls/new", (request, response) => {
@@ -65,13 +70,13 @@ app.get("/urls/new", (request, response) => {
 app.get("/urls/:id", (request, response) => {
   let user = users[request.session["user_id"]];
   if (user === undefined) {
-    response.redirect("/login");
+    response.end("Error: You must login to edit URLs.");
   } else {
     if (user.id === urlDatabase[request.params.id].owner) {
       let templateVars = { user : user, shortURL : request.params.id, urls : urlDatabase };
       response.render("urls_show", templateVars);
     } else {
-      response.end("Not Authorized");
+      response.end("Error: You are not authorized to edit this URL.");
     };
   };
 });
@@ -85,6 +90,7 @@ app.get("/register", (request, response) => {
 });
 
 app.get("/login", (request, response) => {
+
   response.render("urls_login");
 });
 
@@ -106,9 +112,9 @@ app.post("/urls/:id", (request, response) => {
   let user = users[request.session["user_id"]];
   if (user.id === urlDatabase[request.params.id].owner) {
     urlDatabase[request.params.id].longURL = request.body.longURL;
-    response.redirect(`/urls/${request.params.id}`);
+    response.redirect("/urls");
   } else {
-    response.end("Not Authorized");
+    response.end("Error: You are not authorized to update this URL.");
   };
 })
 
@@ -130,7 +136,7 @@ app.post("/login", (request, response) => {
     response.redirect("/urls");
   } else {
     response.status(403);
-    response.end("Error");
+    response.end("Error: invalid credentials.");
   };
 });
 
@@ -141,19 +147,21 @@ app.post("/logout", (request, response) => {
 
 app.post("/register", (request, response) => {
   let newUserID = generateRandomString();
-  if (request.body.email === "" || request.body.email === "" || locateUser(request.body.email)) {
+  if (request.body.email === "" || request.body.password === "") {
     response.status(400);
-    response.end("Error");
+    response.end("Error: Please enter both an e-mail and a password.");
+  } else if (locateUser(request.body.email)) {
+    response.status(400);
+    response.end("Error: User already exists, please login.");
   } else {
     let passwordHash = bcrypt.hashSync(request.body.password, 10);
     users[newUserID] = { id : newUserID , email : request.body.email, password : passwordHash };
-    //console.log(users);
-    response.cookie("user_id", newUserID);
+    request.session.user_id = newUserID;
     response.redirect("/urls")
   }
 });
 
-
+// Allow Express to accept HTTP reqeusts.
 
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);
@@ -174,16 +182,18 @@ function generateRandomString() {
   return result;
 }
 
+// Determine if a user already exists.
+
 function locateUser(emailAddress) {
   for (let userID in users) {
     if (users[userID].email === emailAddress) {
-      console.log("EMAIL FOUND");
       return true;
     }
     return false;
   }
 }
 
+// Identify all URLs that belong to a given user.
 
 function urlsForUser(id) {
   let filteredDatabase = {};
@@ -191,6 +201,6 @@ function urlsForUser(id) {
     if (urlDatabase[key].owner === id) {
       filteredDatabase[key] = { longURL : urlDatabase[key].longURL, owner : urlDatabase[key].owner };
     };
-    return filteredDatabase;
   }
+  return filteredDatabase;
 }
