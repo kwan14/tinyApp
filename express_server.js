@@ -2,7 +2,7 @@
 // Import required modules
 
 const express = require("express");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 
@@ -11,7 +11,10 @@ const bcrypt = require("bcrypt");
 const app = express();
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended : true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: "user_id",
+  keys: ["key1", "key2"]
+}));
 
 // Initialize variables for testing
 
@@ -39,7 +42,7 @@ const users = {
 
 
 app.get("/urls", (request, response) => {
-  let user = users[request.cookies["user_id"]];
+  let user = users[request.session["user_id"]];
   if (user === undefined) {
     response.redirect("/login");
   } else {
@@ -50,7 +53,7 @@ app.get("/urls", (request, response) => {
 });
 
 app.get("/urls/new", (request, response) => {
-  let user = users[request.cookies["user_id"]];
+  let user = users[request.session["user_id"]];
   if (user === undefined) {
     response.redirect("/login");
   } else {
@@ -60,7 +63,7 @@ app.get("/urls/new", (request, response) => {
 });
 
 app.get("/urls/:id", (request, response) => {
-  let user = users[request.cookies["user_id"]];
+  let user = users[request.session["user_id"]];
   if (user === undefined) {
     response.redirect("/login");
   } else {
@@ -90,7 +93,7 @@ app.get("/login", (request, response) => {
 
 
 app.post("/urls/:id/delete", (request, response) => {
-  let user = users[request.cookies["user_id"]];
+  let user = users[request.session["user_id"]];
   if (user.id === urlDatabase[request.params.id].owner) {
     delete urlDatabase[request.params.id];
     response.redirect("/urls");
@@ -100,7 +103,7 @@ app.post("/urls/:id/delete", (request, response) => {
 });
 
 app.post("/urls/:id", (request, response) => {
-  let user = users[request.cookies["user_id"]];
+  let user = users[request.session["user_id"]];
   if (user.id === urlDatabase[request.params.id].owner) {
     urlDatabase[request.params.id].longURL = request.body.longURL;
     response.redirect(`/urls/${request.params.id}`);
@@ -111,7 +114,7 @@ app.post("/urls/:id", (request, response) => {
 
 app.post("/urls", (request, response) => {
   let randomString = generateRandomString();
-  urlDatabase[randomString] = { longURL : request.body.longURL, owner : request.cookies.user_id };
+  urlDatabase[randomString] = { longURL : request.body.longURL, owner : request.session.user_id };
   response.redirect("/urls/" + randomString);
 });
 
@@ -123,7 +126,7 @@ app.post("/login", (request, response) => {
     };
   };
   if (user && bcrypt.compareSync(request.body.password, user.password)) {
-    response.cookie("user_id", user.id);
+    request.session.user_id = user.id;
     response.redirect("/urls");
   } else {
     response.status(403);
@@ -156,8 +159,7 @@ app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);
 });
 
-//console.log("john:" + bcrypt.hashSync("john", 10));
-//console.log("jane:" + bcrypt.hashSync("jane", 10));
+
 
 // A random six character alphanumeric string is being used as simulate the shortened URL
 
